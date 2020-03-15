@@ -1,0 +1,215 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/style.css">
+    <title>Growtopia calculator</title>
+</head>
+<body>
+	<h3 class="ml-2 mt-2">Inputs</h3>
+	<div class="ml-3 mr-2">
+		<label class="text-muted">Starting seeds:</label>
+		<input type="number" class="form-control" id="startingSeedInput" value="0">
+		<small class="form-text text-muted">Input your starting seed here to get the result.</small>
+    	</br>
+    
+    	<label class="text-muted">Starting blocks:</label>
+		<input type="number" class="form-control" id="startingBlockInput" value="0" oninput="gotResults()" readonly>
+	    <small class="form-text text-muted">Or input your starting block here.</small>
+    	</br>
+    
+    	<label class="text-muted">Time farmed:</label>
+        <div class="d-flex">
+            <input type="range" class="custom-range" min="1" max="100" value="1" id="farmedRange">      
+        	<input type="number" class="ml-2 form-control" id="farmedInput" value="1" style="width:30%">
+        </div>
+   	 </br>
+   
+   	 <div class="custom-control custom-switch">
+  		<input type="checkbox" class="custom-control-input" id="customSwitch1">
+  		<label class="custom-control-label" for="customSwitch1">Show farming cycle</label>
+		</div>
+		</br>
+		
+    	<label class="text-muted">Rarity</label>
+    	<div class="d-flex">
+            <input type="range" class="custom-range" min="1" max="246" value="1" id="rarityRange">      
+        	<input type="number" class="ml-2 form-control" id="rarityInput" value="1" style="width:30%">
+        </div>
+   	 </br>
+   
+    	<label class="text-muted">Farmability:</label>
+    	<div class="custom-control custom-radio">
+  	  	<input type="radio" id="notFarmable" name="customRadio" class="custom-control-input" onchange="gotResults()">
+  	  	<label for="notFarmable" class="custom-control-label">Not farmable (Max 4 blocks/tree)</label>
+		</div>
+		<div class="custom-control custom-radio">
+  	 	<input type="radio" id="farmable" name="customRadio" class="custom-control-input" checked onchange="gotResults()">
+  	 	<label for="farmable" class="custom-control-label">Farmable (Max 8 blocks/tree)</label>
+		</div>
+		<div class="custom-control custom-radio">
+  	  	<input type="radio" id="veryFarmable" name="customRadio" class="custom-control-input" onchange="gotResults()">
+  	  	<label for="veryFarmable"  class="custom-control-label">Very farmable (Max 12 blocks/tree)</label>
+		</div>
+		<div class="custom-control custom-radio">
+  	 	<input type="radio" id="superFarmable" name="customRadio" class="custom-control-input" onchange="gotResults()">
+  	 	<label for="superFarmable" class="custom-control-label">Super farmable (Max 16 blocks/tree)</label>
+		</div>
+		</br>
+		
+		<label class="text-muted">Addon:</label>
+		<div class="custom-control custom-switch">
+  		<input type="checkbox" class="custom-control-input" id="harvester" onchange="gotResults()">
+  		<label class="custom-control-label" for="harvester">Using harvester (Beta)</label>
+		</div>
+		<div class="custom-control custom-switch">
+  		<input type="checkbox" class="custom-control-input" id="emeraldLock" onchange="gotResults()">
+  		<label class="custom-control-label" for="emeraldLock">Using emerald lock (Beta)</label>
+		</div>
+		<div class="custom-control custom-switch">
+  		<input type="checkbox" class="custom-control-input" id="clover" onchange="gotResults()">
+  		<label class="custom-control-label" for="clover">Using clover (Soon)</label>
+		</div>
+    </div>
+	
+	<section class="py-5">
+  	<div class="container">
+    	<div class="row">
+      	<div class="col-lg-4">
+        	<div class="card mb-5 mb-lg-0">
+          	<div class="card-body">
+            	<h2 class="card-title text-center">Results</h2>
+            	<hr>
+				<table class="table">
+  		  		<thead>
+    					<tr class="text-muted">
+      					<th scope="col">Data</th>
+      					<th scope="col">Value</th>
+    					</tr>
+  			  	</thead>
+  			  	<tbody id="testing">
+    				</tbody>
+    			</table>
+    		</div>
+    	</div>
+	</section>
+</body>
+<script>
+	var startingSeeds = document.getElementById("startingSeedInput");
+	startingSeeds.oninput = function() {
+		if(this.value >= 9999)
+			this.value = 9999;
+		if(this.value < 0)
+			this.value = 1;
+		gotResults();
+	}
+    var slider = document.getElementById("farmedRange");
+	var output = document.getElementById("farmedInput");
+	output.oninput = function() {
+		slider.value = this.value;
+		if(this.value >= 100)
+			this.value = 100;
+		if(this.value < 0)
+			this.value = 1;
+		gotResults();
+	}
+	slider.onchange = function() {
+		output.value = this.value;
+		gotResults();
+	}
+	var slider2 = document.getElementById("rarityRange");
+	var output2 = document.getElementById("rarityInput");
+	output2.oninput = function() {
+		slider2.value = this.value;
+		if(this.value >= 246)
+			this.value = 246;
+		if(this.value < 0)
+			this.value = 1;
+		gotResults();
+	}
+	slider2.onchange = function() {
+		output2.value = this.value;
+		gotResults();
+	}
+	getBlocksFromTree = function(M, x) {
+		var fruit, fruit2;
+		if(M == 4) {fruit = 1;fruit2 = 1;}
+		else if(M == 8) {fruit = 3;fruit2 = 2;}
+		else if(M == 12) {fruit = 6;fruit2 = 3;}
+		else if(M == 16) {fruit = 10;fruit2 = 4;}
+        return Math.floor((x * fruit / fruit2 * 2.5) + 8); 
+    }
+    getBlocksFromSmashed = function(x) {
+    	return Math.floor(x / 12);
+    }
+    getSeedsFromTree = function(R, x) {
+    	return Math.floor(x * 4 / (R / 10 + 12));
+    }
+    getSeedsFromSmashed = function(x) {
+       return Math.round(x / 4);
+    }
+    getExps = function(R, x) {
+    	return Math.round((R / 5) + 1) * x;
+    }
+    getGems = function(R, x) {
+    	var avg;
+    	if(R < 31) avg = R / 12.5;
+    	else if(R > 30) avg = R / 8.5;
+    	return Math.round((x * 2 / 3) * avg);
+    }
+    getGemsFromEmeraldLock = function(x) {
+    	return Math.round(x * 0.1 / 2);
+    }
+    getDoubleBlockFromHarvester = function(x) {
+    	return Math.floor(x * 0.1);
+    }
+    getGrowTime = function(R) {
+    	var growTime = R * (R * R + 30);
+		var days = Math.floor(growTime / 86400);
+		growTime %= 86400;
+		var hours = Math.floor(growTime / 3600);
+		growTime %= 3600;
+		var minutes = Math.floor(growTime / 60);
+		var seconds = growTime % 60;
+		return growTime = days + " Days " + hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
+    }
+    document.getElementById("testing").innerHTML = "<tr><td>-</td><td>-</td></tr>"
+    gotResults = function()  {
+		var seedInput = document.getElementById("startingSeedInput").value;
+		var rarityInput = document.getElementById("rarityInput").value;
+		var maxDrop = 0;
+		if(document.getElementById("notFarmable").checked == true)
+        	maxDrop = 4;
+    	else if(document.getElementById("farmable").checked == true)
+			maxDrop = 8;
+		else if(document.getElementById("veryFarmable").checked == true)
+			maxDrop = 12;
+		else if(document.getElementById("superFarmable").checked == true)
+			maxDrop = 16;
+			
+		var blocksFromTree = getBlocksFromTree(maxDrop, seedInput);
+		var blocksFromSmashed = getBlocksFromSmashed(blocksFromTree);
+		var growTime = getGrowTime(rarityInput);
+		var semiAllBlocks = (blocksFromTree + blocksFromSmashed);
+		var seedsFromTree = getSeedsFromTree(rarityInput, seedInput);
+		var seedsFromSmashed = getSeedsFromSmashed(semiAllBlocks);
+		var semiAllSeeds = (seedsFromTree + seedsFromSmashed);
+		var expsFromTree = getExps(rarityInput, seedInput);
+		var expsFromSmashed = getExps(rarityInput, semiAllBlocks);
+		var semiAllExps = (expsFromTree + expsFromSmashed);
+		var gemsFromTree = getGems(rarityInput, seedInput);
+		var gemsFromSmashed = getGems(rarityInput, semiAllBlocks);
+		var semiAllGems = (gemsFromTree + gemsFromSmashed);
+		var usedFuel = 0;
+		if(document.getElementById("harvester").checked == true)
+		{
+		    usedFuel = getDoubleBlockFromHarvester(seedInput);
+			semiAllBlocks = (semiAllBlocks + getBlocksFromTree(maxDrop, usedFuel) + 2);
+		}
+		if(document.getElementById("emeraldLock").checked == true)
+			semiAllGems = (semiAllGems + getGemsFromEmeraldLock(semiAllBlocks));
+		document.getElementById("testing").innerHTML = "<tr><td>Total number of blocks smashed</td><td>"+semiAllBlocks+"</td></tr><tr><td>End amount of seeds</td><td>"+semiAllSeeds+"</td></tr><tr><td>Total gems earned</td><td>"+semiAllGems+"</td></tr><tr><td>Total experience gained</td><td>"+semiAllExps+"</td></tr><tr><td>Total growing time</td><td>"+growTime+"</td></tr><tr><td>Total pack fuel needed</td><td>"+usedFuel+"</td></tr>";
+	}
+</script>
+</html>

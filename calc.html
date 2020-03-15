@@ -138,7 +138,7 @@
 		else if(M == 8) {fruit = 3;fruit2 = 2;}
 		else if(M == 12) {fruit = 6;fruit2 = 3;}
 		else if(M == 16) {fruit = 10;fruit2 = 4;}
-        return Math.floor((x * fruit / fruit2 * 2.5) + 8); 
+        return Math.floor(x * fruit / fruit2 * 2.5); 
     }
     getBlocksFromSmashed = function(x) {
     	return Math.floor(x / 12);
@@ -162,7 +162,7 @@
     	return Math.round(x * 0.1 / 2);
     }
     getDoubleBlockFromHarvester = function(x) {
-    	return Math.floor(x * 0.1);
+    	return Math.round(x * 0.1);
     }
     getGrowTime = function(R) {
     	var growTime = R * (R * R + 30);
@@ -178,15 +178,12 @@
     gotResults = function()  {
 		var seedInput = document.getElementById("startingSeedInput").value;
 		var rarityInput = document.getElementById("rarityInput").value;
+		
 		var maxDrop = 0;
-		if(document.getElementById("notFarmable").checked == true)
-        	maxDrop = 4;
-    	else if(document.getElementById("farmable").checked == true)
-			maxDrop = 8;
-		else if(document.getElementById("veryFarmable").checked == true)
-			maxDrop = 12;
-		else if(document.getElementById("superFarmable").checked == true)
-			maxDrop = 16;
+		if(document.getElementById("notFarmable").checked == true) maxDrop = 4;
+    	else if(document.getElementById("farmable").checked == true) maxDrop = 8;
+		else if(document.getElementById("veryFarmable").checked == true) maxDrop = 12;
+		else if(document.getElementById("superFarmable").checked == true) maxDrop = 16;
 			
 		var blocksFromTree = getBlocksFromTree(maxDrop, seedInput);
 		var blocksFromSmashed = getBlocksFromSmashed(blocksFromTree);
@@ -205,11 +202,10 @@
 		if(document.getElementById("harvester").checked == true)
 		{
 		    usedFuel = getDoubleBlockFromHarvester(seedInput);
-			semiAllBlocks = (semiAllBlocks + getBlocksFromTree(maxDrop, usedFuel) + 2);
+			if(usedFuel > 0) semiAllBlocks = (semiAllBlocks + getBlocksFromTree(maxDrop, usedFuel) + 2);
 		}
-		if(document.getElementById("emeraldLock").checked == true)
-			semiAllGems = (semiAllGems + getGemsFromEmeraldLock(semiAllBlocks));
-		document.getElementById("testing").innerHTML = "<tr><td>Total number of blocks smashed</td><td>"+semiAllBlocks+"</td></tr><tr><td>End amount of seeds</td><td>"+semiAllSeeds+"</td></tr><tr><td>Total gems earned</td><td>"+semiAllGems+"</td></tr><tr><td>Total experience gained</td><td>"+semiAllExps+"</td></tr><tr><td>Total growing time</td><td>"+growTime+"</td></tr><tr><td>Total pack fuel needed</td><td>"+usedFuel+"</td></tr>";
+		if(document.getElementById("emeraldLock").checked == true) semiAllGems = (semiAllGems + getGemsFromEmeraldLock(semiAllBlocks));
+		if(seedInput > 0) document.getElementById("testing").innerHTML = "<tr><td>Total number of blocks smashed</td><td>"+semiAllBlocks+"</td></tr><tr><td>End amount of seeds</td><td>"+semiAllSeeds+"</td></tr><tr><td>Total gems earned</td><td>"+semiAllGems+"</td></tr><tr><td>Total experience gained</td><td>"+semiAllExps+"</td></tr><tr><td>Total growing time</td><td>"+growTime+"</td></tr><tr><td>Total pack fuel needed</td><td>"+usedFuel+"</td></tr>";
 	}
 </script>
 </html>
